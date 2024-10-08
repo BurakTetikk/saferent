@@ -6,6 +6,10 @@ import com.saferent.dto.response.SfResponse;
 import com.saferent.entity.ContactMessage;
 import com.saferent.mapper.ContactMessageMapper;
 import com.saferent.service.ContactMessageService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,22 +53,39 @@ public class ContactMessageController {
     public ResponseEntity<List<ContactMessageDTO>> getAllContactMessage() {
 
 
-        List<ContactMessage> contactMessages = contactMessageService.getAll();
+        List<ContactMessage> contactMessageList = contactMessageService.getAll();
 
-        contactMessageMapper.map(contactMessages);
+        List<ContactMessageDTO> contactMessageDTOList = contactMessageMapper.map(contactMessageList);
 
+        return ResponseEntity.ok(contactMessageDTOList); // new ResponseEntity<>(contactMessageDTOList, HttpStatus.OK)
+
+
+    }
+
+    @GetMapping("/pages")
+    public ResponseEntity<Page<ContactMessageDTO>> getAllContactMessageWithPage(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam("sort") String prop,
+            @RequestParam(value = "direction", required = false, defaultValue = "DESC")Sort.Direction direction
+            ) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(prop));
+
+        Page<ContactMessage> contactMessagePage = contactMessageService.getAll(pageable);
+
+        Page<ContactMessageDTO> pageDTO = getPageDTO(contactMessagePage);
+
+        return ResponseEntity.ok(pageDTO);
 
 
     }
 
 
+    private Page<ContactMessageDTO> getPageDTO(Page<ContactMessage> contactMessagePage) {
 
-
-
-
-
-
-
-
+        return  contactMessagePage
+                .map(contactMessage -> contactMessageMapper.contactMessageToDTO(contactMessage));
+    }
 
 }

@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Mapper(componentModel = "spring") // herhangi bir sınıf enjekte edilip kullanılabilir
-@Component
 public interface ContactMessageMapper {
 
 
