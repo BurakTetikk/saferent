@@ -35,7 +35,7 @@ public class ContactMessageService {
 
     }
 
-    public ContactMessage getContactMessageWithId(Long id) {
+    public ContactMessage getContactMessage(Long id) {
 
         return
                 contactMessageRepository
