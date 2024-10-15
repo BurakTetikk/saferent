@@ -55,6 +55,12 @@ management:  #actuator
       enabled: true
 
 
+saferent:
+  app:
+    jwtSecret: safeRent@!10
+    jwtExpirationMs: 86400000
+
+
 
 info:
   application:

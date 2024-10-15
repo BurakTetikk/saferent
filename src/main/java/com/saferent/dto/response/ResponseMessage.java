@@ -6,4 +6,6 @@ public class ResponseMessage {
 
     public static final String CONTACTMESSAGE_UPDATE_RESPONSE = "ContactMessage is updated successfully!!";
 
+    public static final String REGISTER_RESPONSE_MESSAGE = "Registration successfully completed!!";
+
 }
