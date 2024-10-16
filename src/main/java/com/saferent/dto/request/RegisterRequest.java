@@ -39,7 +39,7 @@ public class RegisterRequest {
     @NotBlank(message = "Please provide your Password!!")
     private String password;
 
-    @Pattern(regexp = "^((\\(\\d{3}\\))/\\d{3})[- .]?\\d{3}[- .]?\\d{4}$",
+    @Pattern(regexp = "^\\(\\d{3}\\) \\d{3}-\\d{4}$",
     message = "Please provide valid phone number!!")
     @Size(min = 14, max = 14)
     @NotBlank(message = "Please provide your phone number!!")

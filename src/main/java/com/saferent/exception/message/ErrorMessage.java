@@ -13,5 +13,7 @@ public class ErrorMessage {
 
     public final static String EMAIL_ALREADY_EXIST_MESSAGE = "Email : %s already exist!!";
 
+    public final static String PRINCIPAL_FOUND_MESSAGE = "Use not found!!";
+
 
 }

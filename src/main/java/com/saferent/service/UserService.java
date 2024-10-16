@@ -1,5 +1,6 @@
 package com.saferent.service;
 
+import com.saferent.dto.UserDTO;
 import com.saferent.dto.request.RegisterRequest;
 import com.saferent.entity.Role;
 import com.saferent.entity.User;
@@ -7,13 +8,15 @@ import com.saferent.entity.enums.RoleType;
 import com.saferent.exception.ConflictException;
 import com.saferent.exception.ResourceNotFoundException;
 import com.saferent.exception.message.ErrorMessage;
+import com.saferent.mapper.UserMapper;
 import com.saferent.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.saferent.security.SecurityUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -25,10 +28,13 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, RoleService roleService,@Lazy PasswordEncoder passwordEncoder) {
+    private final UserMapper userMapper;
+
+    public UserService(UserRepository userRepository, RoleService roleService, @Lazy PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.roleService = roleService;
         this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
 
     public User getUserByEmail(String email) {
@@ -73,4 +79,40 @@ public class UserService {
         userRepository.save(user);
 
     }
+
+    public List<UserDTO> getAllUsers() {
+
+        List<User> users = userRepository.findAll();
+
+        List<UserDTO> userDTOS = userMapper.map(users);
+
+        return userDTOS;
+    }
+
+    public UserDTO getPrincipal() {
+
+        User user = getCurrentUser();
+
+       UserDTO userDTO = userMapper.userToUserDTO(user);
+
+       return userDTO;
+
+    }
+
+
+
+    public User getCurrentUser() {
+
+        String email = SecurityUtils.getCurrentUserLogin().orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.PRINCIPAL_FOUND_MESSAGE));
+
+        User user = getUserByEmail(email);
+
+        return user;
+
+    }
+
+
+
+
+
 }
