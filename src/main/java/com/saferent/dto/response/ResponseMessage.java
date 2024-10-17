@@ -8,4 +8,8 @@ public class ResponseMessage {
 
     public static final String REGISTER_RESPONSE_MESSAGE = "Registration successfully completed!!";
 
+    public static final String PASSWORD_CHANGED_RESPONSE_MESSAGE = "Password updated successfully changed!!";
+
+    public static final String USER_UPDATE_RESPONSE_MESSAGE = "User successfully updated !!";
+
 }

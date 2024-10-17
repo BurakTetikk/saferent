@@ -43,7 +43,7 @@ public class SafeRentExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(error);
     }
 
-    @ExceptionHandler(AuthenticationException.class)
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     protected ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException exception, WebRequest request) {
         ApiResponseError error = new ApiResponseError(HttpStatus.FORBIDDEN, exception.getMessage(), request.getDescription(false));
         return buildResponseEntity(error);
@@ -52,6 +52,14 @@ public class SafeRentExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     protected ResponseEntity<Object> handleAuthenticationException(AuthenticationException exception, WebRequest request) {
         ApiResponseError error = new ApiResponseError(HttpStatus.BAD_REQUEST, exception.getMessage(), request.getDescription(false));
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    protected ResponseEntity<Object> handleBadRequestException(BadRequestException exception, WebRequest request) {
+        ApiResponseError error =
+                new ApiResponseError(HttpStatus.BAD_REQUEST, exception.getMessage(), request.getDescription(false));
+
         return buildResponseEntity(error);
     }
 
