@@ -39,7 +39,7 @@ public class User {
     private String phoneNumber;
 
 
-    @Column(length = 15, nullable = false)
+    @Column(length = 50, nullable = false)
     private String address;
 
     @Column(length = 15, nullable = false)

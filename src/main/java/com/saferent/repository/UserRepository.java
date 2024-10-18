@@ -44,4 +44,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 @Param("zipCode") String zipCode);
 
 
+    @EntityGraph(attributePaths = "id")
+    Optional<User> findUserById(Long id);
 }

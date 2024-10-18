@@ -1,6 +1,7 @@
 package com.saferent.service;
 
 import com.saferent.dto.UserDTO;
+import com.saferent.dto.request.AdminUserUpdateRequest;
 import com.saferent.dto.request.RegisterRequest;
 import com.saferent.dto.request.UpdatePasswordRequest;
 import com.saferent.dto.request.UserUpdateRequest;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -195,11 +197,112 @@ public class UserService {
 
     }
 
+    public void updateUserAuth(Long id, AdminUserUpdateRequest adminUserUpdateRequest) {
+
+        User user = getById(id);
+
+        // ** builtIn **
+        if (user.getBuiltIn()) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        // ** check new email exist or not **
+        boolean emailExist = userRepository.existsByEmail(adminUserUpdateRequest.getEmail());
+
+        if (emailExist && !adminUserUpdateRequest.getEmail().equals(user.getEmail())) {
+
+            throw new ConflictException(String.format(ErrorMessage.EMAIL_ALREADY_EXIST_MESSAGE, adminUserUpdateRequest.getEmail()));
+
+        }
+
+        // ** check password **
+        if (adminUserUpdateRequest.getPassword() == null) {
+            adminUserUpdateRequest.setPassword(user.getPassword());
+        } else {
+            String newHashedPassword = passwordEncoder.encode(adminUserUpdateRequest.getPassword());
+
+            adminUserUpdateRequest.setPassword(newHashedPassword);
+        }
+
+        // ** check role **
+        Set<String> userStrRoles = adminUserUpdateRequest.getRoles();
+
+        Set<Role> roles = convertRoles(userStrRoles);
+
+        user.setFirstName(adminUserUpdateRequest.getFirstName());
+        user.setLastName(adminUserUpdateRequest.getLastName());
+        user.setEmail(adminUserUpdateRequest.getEmail());
+        user.setPassword(adminUserUpdateRequest.getPassword());
+        user.setPhoneNumber(adminUserUpdateRequest.getPhoneNumber());
+        user.setAddress(adminUserUpdateRequest.getAddress());
+        user.setZipCode(adminUserUpdateRequest.getZipCode());
+        user.setBuiltIn(adminUserUpdateRequest.getBuiltIn());
+        user.setRoles(roles);
+
+
+        // ** save user **
+        userRepository.save(user);
+
+
+    }
+
+
+
+    public void removeUserById(Long id) {
+
+        User user = getById(id);
+
+        // ** builtIn **
+        if (user.getBuiltIn()) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        userRepository.deleteById(id);
+
+    }
+
+
+    private Set<Role> convertRoles(Set<String> pRoles) {
+        Set<Role> roles = new HashSet<>();
+
+        if (pRoles == null) {
+
+            Role userRole = roleService.findByType(RoleType.ROLE_CUSTOMER);
+
+            roles.add(userRole);
+
+        } else {
+            pRoles.forEach(roleStr -> {
+                if (roleStr.equals(RoleType.ROLE_ADMIN.getName())) {
+
+                    Role adminRole = roleService.findByType(RoleType.ROLE_ADMIN);
+
+                    roles.add(adminRole);
+                } else {
+                    Role customerRole = roleService.findByType(RoleType.ROLE_CUSTOMER);
+
+                    roles.add(customerRole);
+                }
+            });
+        }
+        return roles;
+    }
 
 
 
 
 
+
+
+
+    private User getById(Long id) {
+
+        User user = userRepository
+                .findUserById(id).orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+
+        return user;
+
+    }
 
     private Page<UserDTO> getUserDTOPage(Page<User> userPage) {
 
@@ -207,6 +310,7 @@ public class UserService {
 
 
     }
+
 
 
 }
