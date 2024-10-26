@@ -35,6 +35,6 @@ public class ImageFile {
         this.name = name;
         this.type = type;
         this.imageData = imageData;
-        this.length = imageData.getData().length;
+        this.length = imageData.getData().length ;
     }
 }
