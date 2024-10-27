@@ -1,14 +1,20 @@
 package com.saferent.controller;
 
+import com.saferent.dto.ImageFileDTO;
 import com.saferent.dto.response.ImageUploadResponse;
 import com.saferent.dto.response.ResponseMessage;
+import com.saferent.dto.response.SfResponse;
 import com.saferent.entity.ImageFile;
 import com.saferent.service.ImageFileService;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/files")
@@ -41,7 +47,7 @@ public class ImageFileController {
     @GetMapping("/download/{id}")
     public ResponseEntity<byte[]> downloadFile(@PathVariable("id") String id) {
 
-        ImageFile imageFile = imageFileService.downloadImage(id);
+        ImageFile imageFile = imageFileService.getImagebyId(id);
 
 
         return ResponseEntity
@@ -51,6 +57,53 @@ public class ImageFileController {
 
 
     }
+
+
+    // ** DISPLAY **
+    @GetMapping("/display/{id}")
+    public ResponseEntity<byte[]> displayFile(@PathVariable("id") String id) {
+
+        ImageFile imageFile = imageFileService.getImagebyId(id);
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_PNG);
+
+
+        return new ResponseEntity<>(imageFile.getImageData().getData(), headers, HttpStatus.OK);
+
+
+
+
+    }
+
+
+    // ** GET ALL IMAGES **
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ImageFileDTO>> getAllImages() {
+
+        List<ImageFileDTO> dtoList = imageFileService.getAllImages();
+
+        return ResponseEntity.ok(dtoList);
+
+
+    }
+
+
+    // ** DELETE **
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SfResponse> deleteImageFile(@PathVariable("id") String id) {
+        imageFileService.removeById(id);
+
+        SfResponse response = new SfResponse(ResponseMessage.USER_DELETE_RESPONSE_MESSAGE, true);
+
+
+        return ResponseEntity.ok(response);
+
+    }
+
 
 
 }

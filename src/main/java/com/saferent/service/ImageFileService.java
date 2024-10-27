@@ -1,5 +1,6 @@
 package com.saferent.service;
 
+import com.saferent.dto.ImageFileDTO;
 import com.saferent.entity.ImageData;
 import com.saferent.entity.ImageFile;
 import com.saferent.exception.ResourceNotFoundException;
@@ -8,9 +9,12 @@ import com.saferent.repository.ImageFileRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ImageFileService {
@@ -45,7 +49,7 @@ public class ImageFileService {
 
     }
 
-    public ImageFile downloadImage(String id) {
+    public ImageFile getImagebyId(String id) {
 
         ImageFile imageFile = imageFileRepository
                 .findById(id)
@@ -53,6 +57,36 @@ public class ImageFileService {
 
         return imageFile;
 
+
+    }
+
+    public List<ImageFileDTO> getAllImages() {
+
+        List<ImageFile> imageFiles = imageFileRepository.findAll();
+
+        List<ImageFileDTO> fileDTOS = imageFiles.stream()
+                .map(imageFile -> {
+                    String imageUri = ServletUriComponentsBuilder
+                            .fromCurrentContextPath()
+                            .path("/files/download/")
+                            .path(imageFile.getId()).toUriString();
+
+                    return new ImageFileDTO(imageFile.getName(), imageFile.getType(), imageFile.getLength(), imageUri);
+
+
+                }).collect(Collectors.toList());
+
+
+        return fileDTOS;
+
+
+    }
+
+    public void removeById(String id) {
+
+        ImageFile imageFiles = getImagebyId(id);
+
+        imageFileRepository.delete(imageFiles);
 
     }
 }

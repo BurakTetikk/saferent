@@ -16,4 +16,7 @@ public class ResponseMessage {
 
     public static final String IMAGE_UPLOADED_RESPONSE_MESSAGE = "ImageFile successfully uploaded !!";
 
+
+    public static final String IMAGE_DELETED_RESPONSE_MESSAGE = "ImageFile successfully deleted !!";
+
 }
