@@ -97,7 +97,7 @@ public class ImageFileController {
     public ResponseEntity<SfResponse> deleteImageFile(@PathVariable("id") String id) {
         imageFileService.removeById(id);
 
-        SfResponse response = new SfResponse(ResponseMessage.USER_DELETE_RESPONSE_MESSAGE, true);
+        SfResponse response = new SfResponse(ResponseMessage.IMAGE_DELETED_RESPONSE_MESSAGE, true);
 
 
         return ResponseEntity.ok(response);
