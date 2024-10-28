@@ -1,14 +1,25 @@
 package com.saferent.service;
 
 import com.saferent.dto.CarDTO;
+import com.saferent.dto.response.SfResponse;
 import com.saferent.entity.Car;
 import com.saferent.entity.ImageFile;
+import com.saferent.exception.BadRequestException;
 import com.saferent.exception.ConflictException;
+import com.saferent.exception.ResourceNotFoundException;
 import com.saferent.exception.message.ErrorMessage;
 import com.saferent.mapper.CarMapper;
 import com.saferent.repository.CarRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -67,4 +78,86 @@ public class CarService {
 
 
     }
+
+    public Page<CarDTO> getAllCarsWithPage(Pageable pageable) {
+
+        Page<Car> carPage = carRepository.findAll(pageable);
+
+        return carPage.map(car -> carMapper.carToCarDTO(car));
+
+
+    }
+
+    public CarDTO findById(Long id) {
+
+        // ** ID CHECK **
+        Car car = getCar(id);
+
+        return carMapper.carToCarDTO(car);
+
+    }
+
+    public void updateCar(Long id, String imageId, CarDTO carDTO) {
+
+        Car car = getCar(id);
+
+        // ** CHECK BUILTIN **
+        if (car.getBuiltIn()) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        ImageFile imageFile = imageFileService.findImageById(imageId);
+        List<Car> carList = carRepository.findCarsByImageId(imageFile.getId());
+
+        for (Car c : carList) {
+            if (car.getId().longValue() != c.getId().longValue()) {
+                throw new ConflictException(ErrorMessage.IMAGE_USED_MESSAGE);
+            }
+        }
+
+        car.setAge(carDTO.getAge());
+        car.setAirConditioning(carDTO.getAirConditioning());
+        car.setBuiltIn(carDTO.getBuiltIn());
+        car.setDoors(carDTO.getDoors());
+        car.setFuelType(carDTO.getFuelType());
+        car.setLuggage(carDTO.getLuggage());
+        car.setModel(carDTO.getModel());
+        car.setPricePerHour(carDTO.getPricePerHour());
+        car.setSeats(carDTO.getSeats());
+        car.setTransmission(carDTO.getTransmission());
+
+        car.getImageFiles().add(imageFile);
+
+        carRepository.save(car);
+
+
+    }
+
+    public void removeById(Long id) {
+
+        Car car = getCar(id);
+
+        if (car.getBuiltIn()) {
+            throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+        carRepository.delete(car);
+
+    }
+
+
+    private Car getCar(Long id) {
+
+        Car car = carRepository
+                .findCarById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+
+        return car;
+
+    }
+
+    // imageId: f289f1e1-4b32-48f8-9ac5-604ea5f060cf
+
+
+
 }

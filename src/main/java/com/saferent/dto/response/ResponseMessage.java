@@ -20,4 +20,8 @@ public class ResponseMessage {
 
     public static final String CAR_SAVED_RESPONSE_MESSAGE = "Car successfully saved !!";
 
+    public static final String CAR_UPDATED_RESPONSE_MESSAGE = "Car is updated successfully!!";
+
+    public static final String CAR_DELETED_RESPONSE_MESSAGE = "Car is deleted successfully!!";
+
 }
