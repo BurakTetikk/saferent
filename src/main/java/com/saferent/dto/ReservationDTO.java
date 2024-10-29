@@ -1,7 +1,5 @@
 package com.saferent.dto;
 
-import com.saferent.entity.Car;
-import com.saferent.entity.User;
 import com.saferent.entity.enums.ReservationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

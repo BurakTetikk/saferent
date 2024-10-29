@@ -1,7 +1,6 @@
 package com.saferent.service;
 
 import com.saferent.dto.CarDTO;
-import com.saferent.dto.response.SfResponse;
 import com.saferent.entity.Car;
 import com.saferent.entity.ImageFile;
 import com.saferent.exception.BadRequestException;
@@ -12,14 +11,8 @@ import com.saferent.mapper.CarMapper;
 import com.saferent.repository.CarRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -151,6 +144,16 @@ public class CarService {
         Car car = carRepository
                 .findCarById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+
+        return car;
+
+    }
+
+    public Car getCarById(Long carId) {
+
+        Car car = carRepository
+                .findById(carId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, carId)));
 
         return car;
 

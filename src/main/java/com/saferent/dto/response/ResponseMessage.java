@@ -24,4 +24,6 @@ public class ResponseMessage {
 
     public static final String CAR_DELETED_RESPONSE_MESSAGE = "Car is deleted successfully!!";
 
+    public static final String RESERVATION_CREATED_RESPONSE_MESSAGE = "Reservation is created successfully!!";
+
 }
