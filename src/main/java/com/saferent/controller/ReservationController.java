@@ -1,5 +1,6 @@
 package com.saferent.controller;
 
+import com.saferent.dto.CarDTO;
 import com.saferent.dto.request.ReservationRequest;
 import com.saferent.dto.response.ResponseMessage;
 import com.saferent.dto.response.SfResponse;
@@ -41,6 +42,27 @@ public class ReservationController {
         Car car = carService.getCarById(carId);
 
         User user = userService.getCurrentUser();
+
+        reservationService.createReservation(reservationRequest, user, car);
+
+        SfResponse response = new SfResponse(ResponseMessage.RESERVATION_CREATED_RESPONSE_MESSAGE, true);
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+
+
+    }
+
+
+    // ADMIN make reservation
+    @PostMapping("/add/auth")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SfResponse> addReservation(@RequestParam("userId") Long userId,
+                                                     @RequestParam("carId") Long carId,
+                                                     @Valid @RequestBody ReservationRequest reservationRequest) {
+
+        Car car = carService.getCarById(carId);
+
+        User user = userService.getById(userId);
 
         reservationService.createReservation(reservationRequest, user, car);
 
