@@ -27,6 +27,8 @@ public class ErrorMessage {
 
     public final static String CAR_NOT_AVAILABLE_MESSAGE = "Car is not available for selected time !!";
 
+    public final static String CAR_USED_BY_RESERVATION_MESSAGE = "Car could not be deleted. Car is used by a reservation !!";
+
     public final static String RESERVATION_STATUS_CANT_CHANGE_MESSAGE = "Reservation can't be updated for cancelled or done reservations !!";
 
 

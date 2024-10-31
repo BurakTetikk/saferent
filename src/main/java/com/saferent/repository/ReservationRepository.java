@@ -1,5 +1,6 @@
 package com.saferent.repository;
 
+import com.saferent.entity.Car;
 import com.saferent.entity.Reservation;
 import com.saferent.entity.User;
 import com.saferent.entity.enums.ReservationStatus;
@@ -47,4 +48,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @EntityGraph(attributePaths = {"car", "car.imageFiles", "user"})
     Page<Reservation> findAllByUser(User user, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"car", "car.imageFiles", "user"})
+    Optional<Reservation> findByIdAndUser(Long id, User user);
+
+    boolean existsByCar(Car car);
+
+
 }

@@ -178,6 +178,49 @@ public class ReservationController {
     }
 
 
+    @GetMapping("/{id}/auth")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
+    public ResponseEntity<ReservationDTO> getUserReservationById(@PathVariable("id") Long id) {
+
+        User user = userService.getCurrentUser();
+
+        ReservationDTO reservationDTO = reservationService.findByIdAndUser(id, user);
+
+        return ResponseEntity.ok(reservationDTO);
+
+    }
+
+    @GetMapping("/auth/all")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
+    public ResponseEntity<Page<ReservationDTO>> getAllReservation(@RequestParam("page") int page,
+                                                                  @RequestParam("size") int size,
+                                                                  @RequestParam("sort") String prop,
+                                                                  @RequestParam(value = "direction", required = false, defaultValue = "DESC") Sort.Direction direction) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, prop));
+
+        User user = userService.getCurrentUser();
+
+        Page<ReservationDTO> reservationDTOS = reservationService.findReservationPageByUser(user, pageable);
+
+        return ResponseEntity.ok(reservationDTOS);
+
+    }
+
+
+    @DeleteMapping("/admin/{id}/auth")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SfResponse> deleteReservation(@PathVariable("id") Long id) {
+
+        reservationService.removeById(id);
+
+        SfResponse response = new SfResponse(ResponseMessage.RESERVATION_DELETED_RESPONSE_MESSAGE, true);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+
 
 
 
