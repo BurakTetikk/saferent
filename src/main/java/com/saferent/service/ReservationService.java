@@ -1,14 +1,19 @@
 package com.saferent.service;
 
+import com.saferent.dto.ReservationDTO;
 import com.saferent.dto.request.ReservationRequest;
+import com.saferent.dto.request.ReservationUpdateRequest;
 import com.saferent.entity.Car;
 import com.saferent.entity.Reservation;
 import com.saferent.entity.User;
 import com.saferent.entity.enums.ReservationStatus;
 import com.saferent.exception.BadRequestException;
+import com.saferent.exception.ResourceNotFoundException;
 import com.saferent.exception.message.ErrorMessage;
 import com.saferent.mapper.ReservationMapper;
 import com.saferent.repository.ReservationRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -56,7 +61,7 @@ public class ReservationService {
 
 
     // İstenen rezervasyon tarihleri doğru mu? Örn: başlangıç 10 Aralık bitiş 5 Aralık --- alınan ve verilen tarih aynı olmamalı
-    private void checkReservationTimeIsCorrect(LocalDateTime pickUpTime, LocalDateTime dropOffTime) {
+    public void checkReservationTimeIsCorrect(LocalDateTime pickUpTime, LocalDateTime dropOffTime) {
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -81,7 +86,7 @@ public class ReservationService {
 
 
     // Rezervasyonlar arası çakışma var mı??
-    private List<Reservation> getConflictReservation(Car car, LocalDateTime pickUpTime, LocalDateTime dropOffTime) {
+    public List<Reservation> getConflictReservation(Car car, LocalDateTime pickUpTime, LocalDateTime dropOffTime) {
 
         if (pickUpTime.isAfter(dropOffTime)) {
 
@@ -99,7 +104,7 @@ public class ReservationService {
     }
 
     // Araç müsait mi?
-    private boolean checkCarAvailability(Car car, LocalDateTime pickUpTime, LocalDateTime dropOffTime) {
+    public boolean checkCarAvailability(Car car, LocalDateTime pickUpTime, LocalDateTime dropOffTime) {
 
         List<Reservation> existReservations = getConflictReservation(car, pickUpTime, dropOffTime);
 
@@ -108,7 +113,7 @@ public class ReservationService {
     }
 
     // Fiyat hesaplama
-    private Double getTotalPrice(Car car, LocalDateTime pickUpTime, LocalDateTime dropOffTime) {
+    public Double getTotalPrice(Car car, LocalDateTime pickUpTime, LocalDateTime dropOffTime) {
 
         Long minutes = ChronoUnit.MINUTES.between(pickUpTime, dropOffTime);
 
@@ -119,6 +124,89 @@ public class ReservationService {
     }
 
 
+    public List<ReservationDTO> getAllReservations() {
+
+        List<Reservation> reservations = reservationRepository.findAll();
+
+        return reservationMapper.map(reservations);
+
+    }
+
+    public Page<ReservationDTO> getAllWithPage(Pageable pageable) {
+
+        Page<Reservation> reservationPage = reservationRepository.findAll(pageable);
+
+        return reservationPage.map(reservationMapper::reservationToReservationDTO);
+
+    }
+
+    public void updateReservation(Long reservationId, Car car, ReservationUpdateRequest request) {
+
+        Reservation reservation = getById(reservationId);
+
+        if (reservation.getStatus().equals(ReservationStatus.CANCELLED) || reservation.getStatus().equals(ReservationStatus.DONE)) {
+
+            throw new BadRequestException(ErrorMessage.RESERVATION_STATUS_CANT_CHANGE_MESSAGE);
+
+        }
+
+        if (request.getStatus() != null && request.getStatus() == ReservationStatus.CREATED) {
+
+            checkReservationTimeIsCorrect(request.getPickUpTime(), request.getDropOffTime());
+
+            List<Reservation> conflictReservatiions = getConflictReservation(car, request.getPickUpTime(), request.getDropOffTime());
 
 
+            if (!conflictReservatiions.isEmpty()) {
+
+                if (!(conflictReservatiions.size() == 1 && conflictReservatiions.get(0).equals(reservationId))){
+                    throw new BadRequestException(ErrorMessage.CAR_NOT_AVAILABLE_MESSAGE);
+                }
+
+            }
+
+
+            Double totalPrice = getTotalPrice(car, request.getPickUpTime(), request.getDropOffTime());
+
+            reservation.setTotalPrice(totalPrice);
+            reservation.setCar(car);
+
+
+        }
+
+        reservation.setPickUpTime(request.getPickUpTime());
+        reservation.setDropOffTime(request.getDropOffTime());
+        reservation.setDropOffLocation(request.getDropOffLocation());
+        reservation.setPickUpLocation(request.getPickUpLocation());
+        reservation.setStatus(request.getStatus());
+
+        reservationRepository.save(reservation);
+
+    }
+
+    public Reservation getById(Long id) {
+
+        Reservation reservation = reservationRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessage.RESOURCE_NOT_FOUND_EXCEPTION, id)));
+
+        return reservation;
+
+    }
+
+    public ReservationDTO getReservationDTO(Long id) {
+
+        Reservation reservation = getById(id);
+
+        return reservationMapper.reservationToReservationDTO(reservation);
+
+    }
+
+    public Page<ReservationDTO> findReservationPageByUser(User user, Pageable pageable) {
+
+        Page<Reservation> reservationPage = reservationRepository.findAllByUser(user, pageable);
+
+        return reservationPage.map(reservationMapper::reservationToReservationDTO);
+
+    }
 }
