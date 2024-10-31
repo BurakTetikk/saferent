@@ -20,7 +20,7 @@ public interface ReservationMapper {
 
     Reservation reservationRequestToReservation(ReservationRequest reservationRequest);
 
-    @Mapping(source = "car.imageFile", target = "carDTO.imageFile", qualifiedByName = "getImageAsString")
+    @Mapping(source = "car.imageFiles", target = "carDTO.imageFiles", qualifiedByName = "getImageAsString")
     @Mapping(source = "user", target = "userId", qualifiedByName = "getUserId")
     ReservationDTO reservationToReservationDTO(Reservation reservation);
 
