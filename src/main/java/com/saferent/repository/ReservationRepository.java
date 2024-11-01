@@ -54,5 +54,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     boolean existsByCar(Car car);
 
-
+    boolean existsByUser(User user);
 }

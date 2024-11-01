@@ -24,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -34,13 +33,16 @@ public class UserService {
 
     private final RoleService roleService;
 
+    private final ReservationService reservationService;
+
     private final PasswordEncoder passwordEncoder;
 
     private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository, RoleService roleService, @Lazy PasswordEncoder passwordEncoder, UserMapper userMapper) {
+    public UserService(UserRepository userRepository, RoleService roleService, ReservationService reservationService, @Lazy PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.roleService = roleService;
+        this.reservationService = reservationService;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
     }
@@ -255,6 +257,14 @@ public class UserService {
         // ** builtIn **
         if (user.getBuiltIn()) {
             throw new BadRequestException(ErrorMessage.NOT_PERMITTED_METHOD_MESSAGE);
+        }
+
+
+        //rezervasyon kontrol
+        boolean exist = reservationService.existByUser(user);
+
+        if (exist) {
+            throw new BadRequestException(ErrorMessage.USER_CAN_NOT_BE_DELETED_MESSAGE);
         }
 
         userRepository.deleteById(id);

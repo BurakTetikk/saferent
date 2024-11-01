@@ -31,5 +31,7 @@ public class ErrorMessage {
 
     public final static String RESERVATION_STATUS_CANT_CHANGE_MESSAGE = "Reservation can't be updated for cancelled or done reservations !!";
 
+    public final static String USER_CAN_NOT_BE_DELETED_MESSAGE = "User could not be deleted. User is used by a reservation !! ";
+
 
 }
