@@ -33,5 +33,7 @@ public class ErrorMessage {
 
     public final static String USER_CAN_NOT_BE_DELETED_MESSAGE = "User could not be deleted. User is used by a reservation !! ";
 
+    public final static String EXCEL_REPORT_ERROR_MESSAGE = "Error occured while generating excel report !!";
+
 
 }

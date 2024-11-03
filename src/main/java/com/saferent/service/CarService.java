@@ -168,6 +168,12 @@ public class CarService {
 
     }
 
+    public List<Car> getCars() {
+
+        return carRepository.getAllBy();
+
+    }
+
     // imageId: f289f1e1-4b32-48f8-9ac5-604ea5f060cf
 
 

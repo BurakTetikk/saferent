@@ -248,4 +248,10 @@ public class ReservationService {
         return reservationRepository.existsByUser(user);
 
     }
+
+    public List<Reservation> getAll() {
+
+        return reservationRepository.findAllBy();
+
+    }
 }
