@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,6 +52,7 @@ public class ContactMessageController {
 
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ContactMessageDTO>> getAllContactMessage() {
 
 
@@ -64,6 +66,7 @@ public class ContactMessageController {
     }
 
     @GetMapping("/pages")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<ContactMessageDTO>> getAllContactMessageWithPage(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
@@ -84,6 +87,7 @@ public class ContactMessageController {
 
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ContactMessageDTO> getContactMessageWithPath(@PathVariable("id") Long id) {
 
         ContactMessage contactMessage = contactMessageService.getContactMessage(id);
@@ -97,6 +101,7 @@ public class ContactMessageController {
 
 
     @GetMapping("/request")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ContactMessageDTO> getContactMessageWithRequestParam(@RequestParam("id") Long id) {
 
 
@@ -110,6 +115,7 @@ public class ContactMessageController {
 
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SfResponse> deleteContactMessage(@PathVariable("id") Long id) {
 
         contactMessageService.deleteContactMessage(id);
@@ -121,6 +127,7 @@ public class ContactMessageController {
 
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<SfResponse> updateContactMessage(@PathVariable("id") Long id,
                                                            @Valid @RequestBody ContactMessageRequest request) {
 

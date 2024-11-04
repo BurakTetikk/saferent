@@ -1,6 +1,5 @@
 package com.saferent.controller;
 
-import com.saferent.dto.CarDTO;
 import com.saferent.dto.ReservationDTO;
 import com.saferent.dto.request.ReservationRequest;
 import com.saferent.dto.request.ReservationUpdateRequest;
@@ -27,7 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/reservation")
+@RequestMapping("/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;
